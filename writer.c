@@ -1,3 +1,4 @@
+/*****************************inclusions *************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -8,24 +9,25 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <signal.h>
-
+/*****************************macros******************************************/
 #define FIFO_NAME "myfifo"
 #define BUFFER_SIZE 300
-
+/*****************************data declaration********************************/
 volatile sig_atomic_t signalNumber;
-
+/*****************************functions declaration***************************/
 void handler1( int sig );
 void handler2( int sig );
 
+/*****************************main********************************************/
 int main()
 {   
-    /**/
+    /* data declaration */
     char outputBuffer[BUFFER_SIZE];
 	uint32_t bytesWrote;
 	int32_t returnCode, fd;
     struct sigaction sa;
 
-    /**/
+    /* signal action: SIGUSR1 */
     sa.sa_handler = handler1;
     sa.sa_flags = 0;
     if( sigemptyset( &sa.sa_mask ) == -1)
@@ -39,7 +41,7 @@ int main()
         exit( 1 );
     }
 
-    /**/
+    /* signal action: SIGUSR2 */
     sa.sa_handler = handler2;
     sa.sa_flags = 0;
     if( sigemptyset( &sa.sa_mask ) == -1)
@@ -47,7 +49,7 @@ int main()
         perror( "sigemptyset" );
         exit( 1 );
     }
-    if( sigaction( SIGINT, &sa, NULL ) == -1 )
+    if( sigaction( SIGUSR2, &sa, NULL ) == -1 )
     {
         perror( "sigaction" );
         exit( 1 );
@@ -77,7 +79,7 @@ int main()
         /* Get some text from console */
 		fgets( outputBuffer, BUFFER_SIZE, stdin );
 
-        /**/   
+        /* add headers */   
         char auxBuffer[ BUFFER_SIZE + sizeof( "DATA:" ) ];
         if( signalNumber != 0 )
         {
@@ -95,7 +97,7 @@ int main()
 	}
 	return 0;
 }
-
+/*****************************functions definition****************************/
 void handler1( int sig )
 {
     signalNumber = 1;

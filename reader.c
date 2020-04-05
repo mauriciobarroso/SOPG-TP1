@@ -1,3 +1,4 @@
+/*****************************inclusions *************************************/
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
@@ -7,11 +8,11 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdint.h>
-
+/*****************************macros******************************************/
 #define FIFO_NAME       "myfifo"
 #define BUFFER_SIZE     300
 #define MESSAGES_LIMIT  10
-
+/*****************************main********************************************/
 int main(void)
 {
 	uint8_t inputBuffer[ BUFFER_SIZE ];
@@ -36,7 +37,7 @@ int main(void)
     
     /* open syscalls returned without error -> other process attached to named fifo */
 	printf( "got a writer\n" );
-    /**/
+    /* creation of files log.txt and signals.txt */
     fpLOG = fopen ( "log.txt", "a" );
     if (fpLOG == NULL) 
     { 
@@ -61,7 +62,7 @@ int main(void)
 			inputBuffer[ bytesRead ] = '\0';
 			printf( "reader: read %d bytes: \"%s\"\n", bytesRead, inputBuffer );
 		}
-        /**/
+        /* write of files log.txt or signal.txt */
         if( !strncmp( "DATA:", inputBuffer, sizeof( 5 ) ) )
         {           
             fprintf( fpLOG, "%s\n", inputBuffer );
@@ -75,9 +76,9 @@ int main(void)
 
         messageCounter++;
 	}
- 
-	while ( bytesRead > 0 && messageCounter < MESSAGES_LIMIT );
 
+	while ( bytesRead > 0 && messageCounter < MESSAGES_LIMIT );
+    /* close of files log.txt and signals.txt */
     fclose( fpLOG ); 
     fclose( fpSIGNALS );
 
